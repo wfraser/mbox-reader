@@ -1,6 +1,6 @@
 use std::fmt::{self, Debug, Formatter};
-use std::path::Path;
-use std::{fs, io, str};
+use std::fs::File;
+use std::{io, str};
 
 pub struct MboxReader<'a> {
     data: &'a MboxFile,
@@ -76,9 +76,11 @@ pub struct MboxFile {
 }
 
 impl MboxFile {
-    pub fn from_file(name: &Path) -> io::Result<MboxFile> {
+    /// Safety: it is the caller's responsibility to ensure that the file is not modified for the
+    /// lifetime of the returned struct.
+    pub unsafe fn from_file(file: &File) -> io::Result<MboxFile> {
         Ok(MboxFile {
-            map: unsafe { memmap::Mmap::map(&fs::File::open(name)?)? },
+            map: memmap::Mmap::map(file)?,
         })
     }
     fn len(&self) -> usize {

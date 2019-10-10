@@ -89,7 +89,7 @@ impl MboxFile {
     fn as_slice(&self) -> &[u8] {
         &self.map
     }
-    pub fn iter<'a>(&'a self) -> MboxReader<'a> {
+    pub fn iter(&self) -> MboxReader {
         MboxReader::new(self)
     }
 }
@@ -113,7 +113,7 @@ impl<'a> Entry<'a> {
         self.bytes
             .iter()
             .position(|b| *b == b'\n')
-            .and_then(|idx| Some(&self.bytes[idx + 1..]))
+            .map(|idx| &self.bytes[idx + 1..])
     }
 }
 
